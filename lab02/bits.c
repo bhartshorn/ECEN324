@@ -3,9 +3,9 @@
 *    Lab Datalab
 *    Brother Jones, ECEN 324
 * Author:
-*    Your Name
+*    Brandon Hartshorn
 * Summary:
-*    descriptive text
+*    Lab 02: Avoiding conditionals
 ***********************************************************************/
 
 /* 
@@ -25,7 +25,7 @@
 
 #include "btest.h"
 #include <limits.h>
-#include <stdio.h>
+//#include <stdio.h>
 
 /*
  * Instructions to Students:
