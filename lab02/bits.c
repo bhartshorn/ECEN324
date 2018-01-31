@@ -295,7 +295,8 @@ int bang(int x) {
  *   Rating: 4 
  */
 int leastBitPos(int x) {
-  return 2;
+  // This is the only problem I had to look up an answer for.
+  return x & ((~x) + 1);
 }
 /* 
  * TMax - return maximum two's complement integer 
@@ -381,5 +382,13 @@ int abs(int x) {
  *   Rating: 3
  */
 int addOK(int x, int y) {
-  return 2;
+  int sum = x + y;
+  int x_neg = (x >> 31) & 1;
+  int y_neg = (y >> 31) & 1;
+  int sum_neg = (sum >> 31) & 1;
+
+  int neg_over = x_neg & y_neg & !(sum_neg);
+  int pos_over = !(x_neg) & !(y_neg) & sum_neg;
+
+  return (!neg_over) & (!pos_over);
 }
