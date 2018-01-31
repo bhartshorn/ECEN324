@@ -1,0 +1,26 @@
+24
+3.14159
+A
+Users pay rate: $10.5
+ Hours worked: 40
+    Gross Pay: $420
+Twice 55 is 110
+
+Integer: 99 ###
+Integer:         99 ###
+Integer: 99         ###
+
+  Float: 43.2 ###
+  Float: 43.2       ###
+  Float:      43.20 ###
+  Float: 43.200 ###
+  Float:     43.200 ###
+  Float: 43.2000    ###
+
+*p1 == 42
+*p2 == 42
+*p1 == 53
+*p2 == 53
+*p1 == 88
+*p2 == 53
+Hope you got the point of this example!
