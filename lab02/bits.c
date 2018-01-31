@@ -350,14 +350,26 @@ int isGreater(int x, int y) {
  *   Rating: 2
  */
 int divpwr2(int x, int n) {
-  // flg_isneg is 0x80... for x < 0 or 0x0 for x > 0
+  /* Unsigned division by two is easy, since dividing using right shift
+   * always rounds down (towards 0 in this case, as it should.) However,
+   * we have negative numbers here, which should always be rounded /up/
+   * (towards 0!)
+   *
+   * Bryant and O'hallaron reccomend this method of "biasing" the negative
+   * number on page 106.
+   */
+
+  // flg_isneg is 0x80
   int flg_isneg = (1 << 31);
-  // flg_full  is 0xFF... for x < 0 or 0x0 for x > 0
+
+  // flg_full  is all 1's for negative x or all 0's for positive x
   int flg_full = ((x & flg_isneg) >> 31);
+
   // biased adds (1 << n) -1 only if x < 0
   int biased = (x + (flg_full & ((1 << n) + flg_full)));
   return biased >> n;
 }
+
 /* 
  * abs - absolute value of x (except returns TMin for TMin)
  *   Example: abs(-1) = 1.
@@ -366,13 +378,23 @@ int divpwr2(int x, int n) {
  *   Rating: 4
  */
 int abs(int x) {
-  // flg_isneg is 0x80... for x < 0 or 0x0 for x > 0
+  // flg_isneg is TMin
   int flg_isneg = (1 << 31);
+
+  // flg_full will contain either: all 1's for negative x
+  //                               all 0's for positive x
   int flg_full = ((x & flg_isneg) >> 31);
-  //int abs_neg = (!!(x & flg_isneg)) & ((~x) + 1)
-  //printf("\nx:\t%d flg_full:\t%d x & !flg_full:\t%d\n", x, flg_full, (x & !flg_full));
+
+  // if x is positive, x & ~flg_full will return the original number, while
+  // the second statement will return all 0's. When OR'd, the original
+  // number will be returned.
+  //
+  // if x is negative, x & ~flg_full will return all 0's, while
+  // the second statement will return (~x) + 1, which equals -x. When OR'd,
+  // -x will be returned.
   return (x & ~flg_full) | (((~x) + 1) & flg_full);
 }
+
 /* 
  * addOK - Determine if can compute x+y without overflow
  *   Example: addOK(0x80000000,0x80000000) = 0,
@@ -382,13 +404,30 @@ int abs(int x) {
  *   Rating: 3
  */
 int addOK(int x, int y) {
+  /* This problem is basically gleaned from Computer systems from Bryant and O'Hallaron
+   * page 153. With two's-complement addition, we have two basic cases we need to check
+   * for overflow. They are encapsulated in this table:
+   *
+   * |  x  |  y  |  Sum |
+   * |-----|-----|------|
+   * | Neg | Neg |  Pos |
+   * | Pos | Pos |  Neg |
+   *
+   * If x is pos and y is neg or vice-versa, it is impossible to overflow. If neither
+   * of the above overflow situations happen, we know it is safe to add x and y.
+   *
+   */
+
   int sum = x + y;
+  // Store the positive state of the 3 variables as a 1 or 0
   int x_neg = (x >> 31) & 1;
   int y_neg = (y >> 31) & 1;
   int sum_neg = (sum >> 31) & 1;
 
+  // Calculate whether one of the above overflow situations occured.
   int neg_over = x_neg & y_neg & !(sum_neg);
   int pos_over = !(x_neg) & !(y_neg) & sum_neg;
 
+  // Return 1 if neither occured, 0 if one has
   return (!neg_over) & (!pos_over);
 }
